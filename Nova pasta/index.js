@@ -1,65 +1,72 @@
-const prevBtns = document.querySelectorAll(".btn-prev");
-const nextBtns = document.querySelectorAll(".btn-next");
-const progress = document.getElementById("progress");
-const formSteps = document.querySelectorAll(".step-forms");
-const progressSteps = document.querySelectorAll(".progress-step");
+$(document).ready(function () {
+  var current_fs, next_fs, previous_fs; //fieldsets
+  var opacity;
 
-let formStepsNum = 0;
+  $(".next").click(function () {
+    current_fs = $(this).parent();
+    next_fs = $(this).parent().next();
 
-nextBtns.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    formStepsNum++;
-    updateFormSteps();
-    updateProgressbar();
-  });
-});
+    //Add Class Active
+    $("#progressbar li").eq($("fieldset").index(next_fs)).addClass("active");
 
-prevBtns.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    formStepsNum--;
-    updateFormSteps();
-    updateProgressbar();
-  });
-});
+    //show the next fieldset
+    next_fs.show();
+    //hide the current fieldset with style
+    current_fs.animate(
+      { opacity: 0 },
+      {
+        step: function (now) {
+          // for making fielset appear animation
+          opacity = 1 - now;
 
-function updateFormSteps() {
-  formSteps.forEach((formStep) => {
-    formStep.classList.contains("step-forms-active") &&
-      formStep.classList.remove("step-forms-active");
+          current_fs.css({
+            display: "none",
+            position: "relative",
+          });
+          next_fs.css({ opacity: opacity });
+        },
+        duration: 600,
+      }
+    );
   });
 
-  formSteps[formStepsNum].classList.add("step-forms-active");
-}
+  $(".previous").click(function () {
+    current_fs = $(this).parent();
+    previous_fs = $(this).parent().prev();
 
-function updateProgressbar() {
-  progressSteps.forEach((progressStep, idx) => {
-    if (idx < formStepsNum + 1) {
-      progressStep.classList.add("progress-step-active");
-    } else {
-      progressStep.classList.remove("progress-step-active");
-    }
+    //Remove class active
+    $("#progressbar li")
+      .eq($("fieldset").index(current_fs))
+      .removeClass("active");
+
+    //show the previous fieldset
+    previous_fs.show();
+
+    //hide the current fieldset with style
+    current_fs.animate(
+      { opacity: 0 },
+      {
+        step: function (now) {
+          // for making fielset appear animation
+          opacity = 1 - now;
+
+          current_fs.css({
+            display: "none",
+            position: "relative",
+          });
+          previous_fs.css({ opacity: opacity });
+        },
+        duration: 600,
+      }
+    );
   });
-  progressSteps.forEach((progressStep, idx) => {
-    if (idx < formStepsNum) {
-      progressStep.classList.add("progress-step-check");
-    } else {
-      progressStep.classList.remove("progress-step-check");
-    }
+
+  $(".radio-group .radio").click(function () {
+    $(this).parent().find(".radio").removeClass("selected");
+    $(this).addClass("selected");
   });
-  const progressActive = document.querySelectorAll(".progress-step-active");
-  progress.style.width =
-    ((progressActive.length - 1) / (progressSteps.length - 1)) * 100 + "%";
-}
-document.getElementById("submit-form").addEventListener("click", function () {
-  progressSteps.forEach((progressStep, idx) => {
-    if (idx <= formStepsNum) {
-      progressStep.classList.add("progress-step-check");
-    } else {
-      progressStep.classList.remove("progress-step-check");
-    }
+
+  $(".submit").click(function () {
+    return false;
   });
-  var forms = document.getElementById("forms");
-  forms.classList.remove("form");
-  forms.innerHTML =
-    '<div class="welcome"><div class="content"><svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/><path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/></svg><h2>Thanks for signup!</h2><span>We will contact you soon!</span><div></div>';
 });
